@@ -18,6 +18,8 @@ import ru.liga.currencybase.command.StartCommand;
 @Slf4j
 public class CommandsHandler extends TelegramLongPollingCommandBot {
 
+    private static String CURRENCY_BASE_TOKEN = "123:123";
+
     public CommandsHandler() {
         register(new StartCommand());
         register(new RateServiceCommand());
