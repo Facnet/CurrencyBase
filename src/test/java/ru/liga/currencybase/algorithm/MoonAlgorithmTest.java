@@ -54,7 +54,7 @@ class MoonAlgorithmTest {
         String[] values = getValuesFromXlsx();
         List<Currency> expectedCurrencies = new ArrayList<>();
         for (int i = 0; i < Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK; i++) {
-            expectedCurrencies.add(0, new Currency(currencyCode, LocalDate.now().plusDays(i+1), new BigDecimal(values[i])));
+            expectedCurrencies.add(0, new Currency(currencyCode, LocalDate.now().plusDays(i + 1), new BigDecimal(values[i])));
         }
 
         List<Currency> actualCurrencies = moonAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies);
@@ -126,7 +126,7 @@ class MoonAlgorithmTest {
                 .isExactlyInstanceOf(InsufficientDataException.class);
     }
 
-    private String getValueFromXlsx(){
+    private String getValueFromXlsx() {
         String result = "";
         try {
             FileInputStream file = new FileInputStream("src/test/resources/test.xlsx");
@@ -142,14 +142,14 @@ class MoonAlgorithmTest {
         return result;
     }
 
-    private String[] getValuesFromXlsx(){
+    private String[] getValuesFromXlsx() {
         String[] result = new String[7];
         try {
             FileInputStream file = new FileInputStream("src/test/resources/test.xlsx");
             Workbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(2); // Получить третий лист
             for (int i = 0; i < Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK; i++) {
-                Row row = sheet.getRow(32+i); // Получить 32-ю строку (нумерация с 0)
+                Row row = sheet.getRow(32 + i); // Получить 32-ю строку (нумерация с 0)
                 Cell cell = row.getCell(5); // Получить ячейку F33 - F39
                 result[i] = String.valueOf(cell.getNumericCellValue()); // Вывести значение ячейки
             }
