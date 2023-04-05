@@ -1,10 +1,16 @@
 package ru.liga.currencybase.algorithm;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.liga.currencybase.entity.*;
 import ru.liga.currencybase.exception.InsufficientDataException;
 
+import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,6 +19,10 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/**
+ * Перед запуском теста открыть и сохранить файл src/test/resources/test.xlsx
+ */
 class MoonAlgorithmTest {
 
     MoonAlgorithm moonAlgorithm;
@@ -24,6 +34,7 @@ class MoonAlgorithmTest {
 
     @Test
     void when_WithValidInput_WithPeriod_shouldReturnCorrectResult() {
+
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationPeriod = new Operation(Period.WEEK);
 
@@ -40,14 +51,11 @@ class MoonAlgorithmTest {
             inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(j), bigDecimal));
         }
 
+        String[] values = getValuesFromXlsx();
         List<Currency> expectedCurrencies = new ArrayList<>();
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(7), new BigDecimal("33.26")));//33,26013348
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(6), new BigDecimal("33.25")));//33,25479422
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(5), new BigDecimal("33.25")));//33,24945495
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(4), new BigDecimal("33.24")));//33,24411568
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(3), new BigDecimal("33.24")));//33,23877642
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(2), new BigDecimal("33.23")));//33,23343715
-        expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(1), new BigDecimal("33.23")));//33,22809789
+        for (int i = 0; i < Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK; i++) {
+            expectedCurrencies.add(0, new Currency(currencyCode, LocalDate.now().plusDays(i+1), new BigDecimal(values[i])));
+        }
 
         List<Currency> actualCurrencies = moonAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies);
 
@@ -73,7 +81,7 @@ class MoonAlgorithmTest {
         }
 
         List<Currency> expectedCurrencies = new ArrayList<>();
-        expectedCurrencies.add(new Currency(currencyCode, operationDate.getDate(), new BigDecimal("14.05")));//14,05190211
+        expectedCurrencies.add(new Currency(currencyCode, operationDate.getDate(), new BigDecimal(getValueFromXlsx())));//14,05190211
 
         List<Currency> actualCurrencies = moonAlgorithm.execute(currencyCode, operationDate, inputCurrencies);
 
@@ -98,7 +106,6 @@ class MoonAlgorithmTest {
 
         assertThatThrownBy(() -> moonAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
-
     }
 
     @Test
@@ -117,5 +124,39 @@ class MoonAlgorithmTest {
 
         assertThatThrownBy(() -> moonAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
                 .isExactlyInstanceOf(InsufficientDataException.class);
+    }
+
+    private String getValueFromXlsx(){
+        String result = "";
+        try {
+            FileInputStream file = new FileInputStream("src/test/resources/test.xlsx");
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(1); // Получить второй лист
+            Row row = sheet.getRow(32); // Получить 32-ю строку (нумерация с 0)
+            Cell cell = row.getCell(5); // Получить ячейку F33
+            result = String.valueOf(cell.getNumericCellValue()); // Вывести значение ячейки
+            workbook.close(); // Закрыть файл
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private String[] getValuesFromXlsx(){
+        String[] result = new String[7];
+        try {
+            FileInputStream file = new FileInputStream("src/test/resources/test.xlsx");
+            Workbook workbook = new XSSFWorkbook(file);
+            Sheet sheet = workbook.getSheetAt(2); // Получить третий лист
+            for (int i = 0; i < Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK; i++) {
+                Row row = sheet.getRow(32+i); // Получить 32-ю строку (нумерация с 0)
+                Cell cell = row.getCell(5); // Получить ячейку F33 - F39
+                result[i] = String.valueOf(cell.getNumericCellValue()); // Вывести значение ячейки
+            }
+            workbook.close(); // Закрыть файл
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
