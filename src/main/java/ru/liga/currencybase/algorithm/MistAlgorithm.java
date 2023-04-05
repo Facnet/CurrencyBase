@@ -1,6 +1,7 @@
 package ru.liga.currencybase.algorithm;
 
 import ru.liga.currencybase.entity.*;
+import ru.liga.currencybase.exception.InsufficientDataException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -53,7 +54,7 @@ public class MistAlgorithm implements Algorithms {
             nextDate = nextDate.plusDays(1);
         }
         if (operation.getPeriod().equals(Period.TOMORROW)) {
-            return Collections.singletonList(buffer.get(0));
+            return Collections.singletonList(result.get(0));
         }
         return result;
     }
@@ -93,7 +94,7 @@ public class MistAlgorithm implements Algorithms {
      * @param currencies список валют
      * @param currentDay день
      * @return список валют
-     * @throws IllegalArgumentException "Не было найдено значение"
+     * @throws InsufficientDataException "Не было найдено значение"
      */
     private List<Currency> receiveMatchCurrency(List<Currency> currencies, int currentDay) {
         List<Currency> buffer = new ArrayList<>();
@@ -103,7 +104,7 @@ public class MistAlgorithm implements Algorithms {
             }
         }
         if (buffer.isEmpty()) {
-            throw new IllegalArgumentException("Не было найдено значение предыдущих лет за этот календарный день");
+            throw new InsufficientDataException("Не было найдено значение предыдущих лет за этот календарный день");
         }
         return buffer;
     }

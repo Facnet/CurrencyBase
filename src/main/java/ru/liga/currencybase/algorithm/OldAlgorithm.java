@@ -66,7 +66,7 @@ public class OldAlgorithm implements Algorithms {
             nextDate = nextDate.plusDays(1);
         }
         if (operation.getPeriod().equals(Period.TOMORROW)) {
-            return Collections.singletonList(buffer.get(0));
+            return Collections.singletonList(result.get(0));
         }
         return result;
     }
