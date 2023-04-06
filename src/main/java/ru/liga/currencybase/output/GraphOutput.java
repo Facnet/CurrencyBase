@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class GraphOutput implements Outputs {
     private final CurrencyLineChart currencyLineChart = new CurrencyLineChart();
+
     /**
      * Выводим валюту
      *

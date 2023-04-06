@@ -1,16 +1,19 @@
 package ru.liga.currencybase.command;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.currencybase.entity.Algorithm;
 import ru.liga.currencybase.entity.CurrencyCode;
 import ru.liga.currencybase.entity.Operation;
 import ru.liga.currencybase.entity.Output;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Класс для парсинга аргументов команды RATE
  */
+@Slf4j
 public class ParserRateCommand {
     private final CheckerRateCommand checkerRateCommand;
 
@@ -66,6 +69,7 @@ public class ParserRateCommand {
         if (buffer[0].equals("date")) {
             return new Operation(checkerRateCommand.checkDate(buffer[1]));
         }
+        log.error("Некорректная команда "+ Arrays.toString(input));
         throw new IllegalArgumentException("Некорректная команда. Первый параметр должен быть 'date' или 'period'");
     }
 
@@ -81,6 +85,7 @@ public class ParserRateCommand {
         if (buffer[0].equals("alg")) {
             return checkerRateCommand.checkAlgorithm(buffer[1]);
         }
+        log.error("Некорректная команда "+ Arrays.toString(input));
         throw new IllegalArgumentException("Некорректная команда. Второй параметр должен быть 'alg'");
     }
 
@@ -97,6 +102,7 @@ public class ParserRateCommand {
             if (buffer[0].equals("output")) {
                 return checkerRateCommand.checkOutput(buffer[1]);
             } else {
+                log.error("Некорректная команда "+ Arrays.toString(input));
                 throw new IllegalArgumentException("Некорректная команда. Третий параметр должен быть 'output'");
             }
         }

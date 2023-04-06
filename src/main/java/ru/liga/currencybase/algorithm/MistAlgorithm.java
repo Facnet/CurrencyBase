@@ -1,5 +1,6 @@
 package ru.liga.currencybase.algorithm;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.currencybase.entity.*;
 import ru.liga.currencybase.exception.InsufficientDataException;
 
@@ -14,6 +15,7 @@ import java.util.Random;
 /**
  * Алгоритм “Мистический”
  */
+@Slf4j
 public class MistAlgorithm implements Algorithms {
     /**
      * Прогнозируем валюту
@@ -104,6 +106,7 @@ public class MistAlgorithm implements Algorithms {
             }
         }
         if (buffer.isEmpty()) {
+            log.error("Не было найдено значение " + currentDay);
             throw new InsufficientDataException("Не было найдено значение предыдущих лет за этот календарный день");
         }
         return buffer;

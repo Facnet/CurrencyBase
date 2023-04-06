@@ -1,5 +1,6 @@
 package ru.liga.currencybase.executor;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.currencybase.algorithm.*;
 import ru.liga.currencybase.entity.Algorithm;
 import ru.liga.currencybase.entity.CurrencyCode;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * Класс для запуска алгоритма
  */
+@Slf4j
 public class AlgorithmExecutor {
     private final CacheCurrency cache;
 
@@ -37,7 +39,10 @@ public class AlgorithmExecutor {
             case PAST_YEAR -> algorithmImpl = new PastYearAlgorithm();
             case MIST -> algorithmImpl = new MistAlgorithm();
             case MOON -> algorithmImpl = new MoonAlgorithm();
-            default -> throw new IllegalArgumentException("Ой, забыли реализовать алгоритм, для " + algorithm);
+            default -> {
+                log.error("Ой, забыли реализовать алгоритм, для " + algorithm);
+                throw new IllegalArgumentException("Ой, забыли реализовать алгоритм, для " + algorithm);
+            }
         }
         return algorithmImpl.execute(currencyCode, operation, currencies);
     }

@@ -125,6 +125,7 @@ public class MoonAlgorithm implements Algorithms {
      */
     private void checkInsufficientData(List<Currency> currencies) {
         if (currencies.size() < Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH) {
+            log.error("Файл содержит недостаточно данных " + currencies.size());
             throw new InsufficientDataException("Файл содержит недостаточно данных");
         }
     }

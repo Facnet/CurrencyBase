@@ -1,5 +1,6 @@
 package ru.liga.currencybase.file;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.currencybase.entity.Constant;
 import ru.liga.currencybase.entity.CurrencyCode;
 import ru.liga.currencybase.entity.Currency;
@@ -14,6 +15,7 @@ import java.util.List;
 /**
  * Класс для работы с файлом
  */
+@Slf4j
 public class FileParser {
     private final FileReader fileReader;
 
@@ -36,9 +38,10 @@ public class FileParser {
         for (String stringFromFile : stringsFromCsvFile) {
             String[] buffer = stringFromFile.split(Constant.DELIMITER_CSV_FILE);
             if (buffer.length != 4) {
+                log.error("Неправильный формат CSV-файла, ожидается 'nominal;data;curs;cdx' " + csvFilePath);
                 throw new CsvFormatException("Неправильный формат CSV-файла, ожидается 'nominal;data;curs;cdx' " + csvFilePath);
             }
-            currencies.add(new Currency(CurrencyCode.valueOf(currencyCode),toLocalDate(buffer[1]), toBigDecimal(buffer[2])));
+            currencies.add(new Currency(CurrencyCode.valueOf(currencyCode), toLocalDate(buffer[1]), toBigDecimal(buffer[2])));
         }
         return currencies;
     }
@@ -54,6 +57,7 @@ public class FileParser {
         try {
             return new BigDecimal(value.replace(",", "."));
         } catch (NumberFormatException e) {
+            log.error("Неправильный формат курса в файле, ожидается запятая " + value + " " + e);
             throw new RuntimeException("Неправильный формат курса в файле, ожидается запятая " + value);
         }
     }
@@ -69,6 +73,7 @@ public class FileParser {
         try {
             return LocalDate.parse(value, Constant.FORMATTER_FOR_PARSE_FILE);
         } catch (DateTimeParseException e) {
+            log.error("Неправильный формат даты в файле, ожидается 'ДД.ММ.ГГГГ'." + value + " " + e);
             throw new DateTimeParseException("Неправильный формат даты в файле, ожидается 'ДД.ММ.ГГГГ'." + value, value, e.getErrorIndex());
         }
     }

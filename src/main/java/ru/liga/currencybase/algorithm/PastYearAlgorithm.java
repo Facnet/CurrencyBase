@@ -1,5 +1,6 @@
 package ru.liga.currencybase.algorithm;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.liga.currencybase.entity.*;
 import ru.liga.currencybase.exception.InsufficientDataException;
 
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * Алгоритм “Прошлогодний”
  */
+@Slf4j
 public class PastYearAlgorithm implements Algorithms {
 
     /**
@@ -89,6 +91,7 @@ public class PastYearAlgorithm implements Algorithms {
             }
             date = date.minusDays(1);
             if (date.isEqual(Constant.MIN_DATE)) {
+                log.error("В файле не была найдена запрашиваемая дата");
                 throw new InsufficientDataException("В файле не была найдена запрашиваемая дата");
             }
         }
@@ -103,6 +106,7 @@ public class PastYearAlgorithm implements Algorithms {
     @Override
     public void checkOperationDate(LocalDate localDate) {
         if (localDate.isBefore(Constant.MIN_DATE.minusDays(1))) {
+            log.error("Некорректная дата " + localDate);
             throw new IllegalArgumentException("Дата должна быть после 31 декабря 2005");
         }
     }

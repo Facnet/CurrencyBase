@@ -28,17 +28,23 @@ abstract class ServiceCommand extends BotCommand {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.enableHtml(true);
-        message.setText(messageText.toString());
+        if (messageText.length() < 4096) {
+            message.setText(messageText.toString());
+        } else {
+            message.setText("Ой, при выполнении команды формируется слишком большой текст, выполните команду частями");
+            log.error(getUserName(user) + " " + commandName + " слишком большой текст");
+        }
         try {
             absSender.execute(message);
         } catch (TelegramApiException e) {
             log.error(getUserName(user) + " " + commandName + " " + e);
         }
     }
+
     /**
      * Отправка фото пользователю
      */
-    void sendImage(AbsSender absSender, String commandName, User user, Chat chat){
+    void sendImage(AbsSender absSender, String commandName, User user, Chat chat) {
         try {
             SendPhoto sendPhoto = new SendPhoto();
             sendPhoto.setChatId(chat.getId());
