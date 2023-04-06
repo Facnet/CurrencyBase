@@ -1,8 +1,7 @@
 package ru.liga.currencybase.executor;
 
-import ru.liga.currencybase.entity.Output;
 import ru.liga.currencybase.entity.Currency;
-import ru.liga.currencybase.output.DefaultOutput;
+import ru.liga.currencybase.entity.Output;
 import ru.liga.currencybase.output.GraphOutput;
 import ru.liga.currencybase.output.ListOutput;
 import ru.liga.currencybase.output.Outputs;
@@ -25,7 +24,9 @@ public class OutputExecutor {
         switch (output){
             case LIST -> outputImpl = new ListOutput();
             case GRAPH -> outputImpl = new GraphOutput();
-            case DEFAULT -> outputImpl = new DefaultOutput();
+            case DEFAULT -> {
+                return currencies.get(currencies.size() - 1).toString();
+            }
             default -> throw new IllegalArgumentException("Ой, забыли написать вывод, для " + output);
         }
         return outputImpl.execute(currencies);

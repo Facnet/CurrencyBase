@@ -5,6 +5,7 @@ import org.telegram.telegrambots.extensions.bots.commandbot.commands.ICommandReg
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+import ru.liga.currencybase.entity.CommandIdentifier;
 
 
 /**
@@ -14,7 +15,7 @@ public class HelpCommand extends ServiceCommand {
     private final ICommandRegistry commandRegistry;
 
     public HelpCommand(ICommandRegistry commandRegistry) {
-        super("help", "Получите все команды, которые предоставляет этот бот");
+        super(CommandIdentifier.HELP.name().toLowerCase(), "Получите все команды, которые предоставляет этот бот");
         this.commandRegistry = commandRegistry;
     }
 
@@ -27,6 +28,6 @@ public class HelpCommand extends ServiceCommand {
             helpMessageBuilder.append(botCommand.toString()).append("\n\n");
         }
 
-        sendAnswer(absSender, chat, this.getCommandIdentifier(), user, helpMessageBuilder);
+        sendAnswer(absSender, chat.getId().toString(), this.getCommandIdentifier(), user, helpMessageBuilder);
     }
 }

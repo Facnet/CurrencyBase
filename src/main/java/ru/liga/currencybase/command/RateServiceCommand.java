@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+import ru.liga.currencybase.entity.CommandIdentifier;
 import ru.liga.currencybase.entity.Output;
 import ru.liga.currencybase.executor.RateExecutor;
-import ru.liga.currencybase.factory.ParserRateCommandFactory;
 import ru.liga.currencybase.factory.RateFactory;
 
 import java.util.Arrays;
@@ -20,12 +20,12 @@ public class RateServiceCommand extends ServiceCommand {
     private final ParserRateCommand parserRateCommand;
 
     public RateServiceCommand() {
-        super("rate", """
+        super(CommandIdentifier.RATE.name().toLowerCase(), """
                 Алгоритм прогнозирования курса валют.
                 rate 'код_валюты' -period tomorrow/week/month -alg old/past_year/mist -output list/graph
                 rate 'код_валюты' -date 'День.Месяц.Год' -alg old/past_year/mist -output list/graph""");
         this.rateExecutor = RateFactory.buildRateExecutor();
-        this.parserRateCommand = ParserRateCommandFactory.buildParserRateCommand();
+        this.parserRateCommand = new ParserRateCommand(new CheckerRateCommand());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class RateServiceCommand extends ServiceCommand {
             messageBuilder.append(" КРИТИЧЕСКАЯ ОШИБКА: ").append(e.getMessage());
             log.error(messageBuilder.toString());
         }
-        sendAnswer(absSender, chat, this.getCommandIdentifier(), user, messageBuilder);
+        sendAnswer(absSender, chat.getId().toString(), this.getCommandIdentifier(), user, messageBuilder);
         log.info("выполнили команду:" + Arrays.toString(strings));
     }
 }
