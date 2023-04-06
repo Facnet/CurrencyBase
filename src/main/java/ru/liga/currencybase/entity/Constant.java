@@ -15,6 +15,7 @@ public class Constant {
     public static final String DELIMITER_CSV_FILE = ";";
     public static final Duration DEFAULT_CACHE_TIME = Duration.ofHours(6);
     public static final LocalDate MIN_DATE = LocalDate.parse("01.01.2005", Constant.FORMATTER_FOR_PARSE_FILE);
+    public static final int MIN_YEAR = 2023;
     public static final int DEFAULT_IMAGE_WIDTH = 1920;
     public static final int DEFAULT_IMAGE_HEIGHT = 1080;
 }

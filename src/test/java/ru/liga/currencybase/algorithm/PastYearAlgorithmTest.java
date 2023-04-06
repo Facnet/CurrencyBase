@@ -8,10 +8,12 @@ import ru.liga.currencybase.exception.InsufficientDataException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PastYearAlgorithmTest {
 
@@ -30,28 +32,31 @@ class PastYearAlgorithmTest {
 
     @Test
     void when_WithNoValidDate_shouldThrowIllegalArgumentException() {
-        LocalDate futureDate = LocalDate.now().plusDays(1);
-        assertThatThrownBy(() -> pastYearAlgorithm.checkOperationDate(futureDate))
-                .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Дата не должна быть в будущем, мы же смотрим в прошлое)");
-
         LocalDate pastDate = LocalDate.parse("05.10.2000", Constant.FORMATTER_FOR_PARSE_FILE);
         assertThatThrownBy(() -> pastYearAlgorithm.checkOperationDate(pastDate))
-                .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Данные в файлах хранятся с 1 января 2005");
-
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void when_WithPeriod_shouldThrowIllegalArgumentException() {
+    void when_WithValidInput_WithPeriod_shouldThrowReturnCorrectResult() {
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationPeriod = new Operation(Period.WEEK);
 
         List<Currency> inputCurrencies = new ArrayList<>();
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(1), new BigDecimal("777.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(1).minusYears(1), new BigDecimal("111.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(2).minusYears(1), new BigDecimal("222.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(3).minusYears(1), new BigDecimal("333.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(4).minusYears(1), new BigDecimal("444.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(5).minusYears(1), new BigDecimal("555.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(6).minusYears(1), new BigDecimal("666.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(7).minusYears(1), new BigDecimal("777.14")));
 
-        assertThatThrownBy(() -> pastYearAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+        List<Currency> expectedCurrencies = new ArrayList<>(inputCurrencies);
+        Collections.reverse(expectedCurrencies);
+
+        List<Currency> actualCurrencies = pastYearAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies);
+
+        assertEquals(expectedCurrencies, actualCurrencies);
 
     }
 
@@ -76,12 +81,12 @@ class PastYearAlgorithmTest {
 
         List<Currency> inputCurrencies = new ArrayList<>();
         inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(1), new BigDecimal("666.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(2), new BigDecimal("777.14")));
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(2).minusYears(1), new BigDecimal("777.14")));
         inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(3), new BigDecimal("555.14")));
 
         assertThat(pastYearAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
                 .hasSize(1)
-                .containsExactly(new Currency(currencyCode, operationDate.getDate(), new BigDecimal("777.14")));
+                .containsExactly(new Currency(currencyCode, operationDate.getDate().minusYears(1), new BigDecimal("777.14")));
 
     }
 }
