@@ -14,6 +14,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ru.liga.currencybase.TestHelper.receiveCurrency;
 
 class PastYearAlgorithmTest {
 
@@ -38,21 +39,15 @@ class PastYearAlgorithmTest {
     }
 
     @Test
-    void when_WithValidInput_WithPeriod_shouldThrowReturnCorrectResult() {
+    void when_WithValidInput_WithPeriod_shouldReturnCorrectResult() {
         CurrencyCode currencyCode = CurrencyCode.EUR;
-        Operation operationPeriod = new Operation(Period.WEEK);
+        Operation operationPeriod = new Operation(Period.TOMORROW);
 
-        List<Currency> inputCurrencies = new ArrayList<>();
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(1).minusYears(1), new BigDecimal("111.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(2).minusYears(1), new BigDecimal("222.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(3).minusYears(1), new BigDecimal("333.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(4).minusYears(1), new BigDecimal("444.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(5).minusYears(1), new BigDecimal("555.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(6).minusYears(1), new BigDecimal("666.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(7).minusYears(1), new BigDecimal("777.14")));
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("444.14"), Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK)
+        );
 
-        List<Currency> expectedCurrencies = new ArrayList<>(inputCurrencies);
-        Collections.reverse(expectedCurrencies);
+        List<Currency> expectedCurrencies = Collections.singletonList(inputCurrencies.get(0));
 
         List<Currency> actualCurrencies = pastYearAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies);
 
@@ -61,9 +56,26 @@ class PastYearAlgorithmTest {
     }
 
     @Test
-    void when_WithNoValidInput_WithValidDate_shouldThrowInsufficientDataException() {
+    void when_WithValidInput_WithValidDate_shouldReturnCorrectResult() {
+        CurrencyCode currencyCode = CurrencyCode.AMD;
+        Operation operationDate = new Operation(LocalDate.now().minusDays(10));
+
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("22.22"), Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK)
+        );
+        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusYears(1).minusDays(10), new BigDecimal("777.14")));
+
+        assertThat(pastYearAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
+                .hasSize(1)
+                .containsExactly(new Currency(currencyCode, operationDate.getDate().minusYears(1), new BigDecimal("777.14")));
+
+    }
+
+    @Test
+    void when_WithNoValidInput_shouldThrowInsufficientDataException() {
         CurrencyCode currencyCode = CurrencyCode.TRY;
         Operation operationDate = new Operation(LocalDate.now().minusDays(4));
+        Operation operationPeriod = new Operation(Period.WEEK);
 
         List<Currency> inputCurrencies = new ArrayList<>();
         inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(1), new BigDecimal("666.14")));
@@ -72,21 +84,8 @@ class PastYearAlgorithmTest {
 
         assertThatThrownBy(() -> pastYearAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
                 .isExactlyInstanceOf(InsufficientDataException.class);
-    }
 
-    @Test
-    void when_WithValidInput_WithValidDate_shouldReturnCorrectResult() {
-        CurrencyCode currencyCode = CurrencyCode.AMD;
-        Operation operationDate = new Operation(LocalDate.now().minusDays(2));
-
-        List<Currency> inputCurrencies = new ArrayList<>();
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(1), new BigDecimal("666.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(2).minusYears(1), new BigDecimal("777.14")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(3), new BigDecimal("555.14")));
-
-        assertThat(pastYearAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
-                .hasSize(1)
-                .containsExactly(new Currency(currencyCode, operationDate.getDate().minusYears(1), new BigDecimal("777.14")));
-
+        assertThatThrownBy(() -> pastYearAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies))
+                .isExactlyInstanceOf(InsufficientDataException.class);
     }
 }

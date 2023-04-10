@@ -3,10 +3,7 @@ package ru.liga.currencybase.algorithm;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.liga.currencybase.entity.Currency;
-import ru.liga.currencybase.entity.CurrencyCode;
-import ru.liga.currencybase.entity.Operation;
-import ru.liga.currencybase.entity.Period;
+import ru.liga.currencybase.entity.*;
 import ru.liga.currencybase.exception.InsufficientDataException;
 
 import java.math.BigDecimal;
@@ -15,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ru.liga.currencybase.TestHelper.receiveCurrency;
 
 class MistAlgorithmTest {
 
@@ -31,15 +29,10 @@ class MistAlgorithmTest {
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationPeriod = new Operation(Period.TOMORROW);
 
-        List<Currency> inputCurrencies = new ArrayList<>();
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(1), new BigDecimal("50.6")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(2), new BigDecimal("55.5")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(3), new BigDecimal("52.6")));
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("50.6"), Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK)
+        );
         inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(1), new BigDecimal("52.7")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(5), new BigDecimal("53.4")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(6), new BigDecimal("52.4")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(7), new BigDecimal("51.1")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(8), new BigDecimal("51.1")));
 
         List<Currency> expectedCurrencies = new ArrayList<>();
         expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(1), new BigDecimal("52.70")));
@@ -54,15 +47,10 @@ class MistAlgorithmTest {
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationDate = new Operation(LocalDate.now().plusDays(3));
 
-        List<Currency> inputCurrencies = new ArrayList<>();
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(1), new BigDecimal("78.6")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(2), new BigDecimal("54.5")));
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("552.6"), Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK)
+        );
         inputCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(3), new BigDecimal("654.6")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(4), new BigDecimal("65.7")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(5), new BigDecimal("4.4")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(6), new BigDecimal("552.4")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(7), new BigDecimal("561.1")));
-        inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(8), new BigDecimal("541.1")));
 
         List<Currency> expectedCurrencies = new ArrayList<>();
         expectedCurrencies.add(new Currency(currencyCode, LocalDate.now().plusDays(3), new BigDecimal("654.60")));

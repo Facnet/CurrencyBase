@@ -12,13 +12,14 @@ import ru.liga.currencybase.exception.InsufficientDataException;
 
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static ru.liga.currencybase.TestHelper.receiveCurrency;
 
 /**
  * Перед запуском теста открыть и сохранить файл src/test/resources/test.xlsx
@@ -34,27 +35,18 @@ class MoonAlgorithmTest {
 
     @Test
     void when_WithValidInput_WithPeriod_shouldReturnCorrectResult() {
-
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationPeriod = new Operation(Period.WEEK);
 
-        BigDecimal bigDecimal = new BigDecimal("33.14");
-        int j = 1;
-
-        List<Currency> inputCurrencies = new ArrayList<>();
-        for (double i = 1; i < Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH + 1; i++, j++) {
-            if (i % 2 == 0) {
-                bigDecimal = bigDecimal.subtract(BigDecimal.valueOf(i / 10));
-            } else {
-                bigDecimal = bigDecimal.add(BigDecimal.valueOf(i / 10));
-            }
-            inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(j), bigDecimal));
-        }
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("33.14"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
 
         String[] values = getValuesFromXlsx();
         List<Currency> expectedCurrencies = new ArrayList<>();
         for (int i = 0; i < Constant.NUMBER_OF_PREVIOUS_COURSES_WEEK; i++) {
-            expectedCurrencies.add(0, new Currency(currencyCode, LocalDate.now().plusDays(i + 1), new BigDecimal(values[i])));
+            expectedCurrencies.add(0,
+                    new Currency(currencyCode, LocalDate.now().plusDays(i + 1), new BigDecimal(values[i]).setScale(2, RoundingMode.HALF_UP)));
         }
 
         List<Currency> actualCurrencies = moonAlgorithm.execute(currencyCode, operationPeriod, inputCurrencies);
@@ -67,21 +59,12 @@ class MoonAlgorithmTest {
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationDate = new Operation(LocalDate.now().plusDays(1));
 
-        BigDecimal bigDecimal = new BigDecimal("14.14");
-        int j = 1;
-
-        List<Currency> inputCurrencies = new ArrayList<>();
-        for (double i = 1; i < Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH + 1; i++, j++) {
-            if (i % 2 == 0) {
-                bigDecimal = bigDecimal.add(BigDecimal.valueOf(i / 10));
-            } else {
-                bigDecimal = bigDecimal.subtract(BigDecimal.valueOf(i / 10));
-            }
-            inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(j), bigDecimal));
-        }
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("14.14"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
 
         List<Currency> expectedCurrencies = new ArrayList<>();
-        expectedCurrencies.add(new Currency(currencyCode, operationDate.getDate(), new BigDecimal(getValueFromXlsx())));//14,05190211
+        expectedCurrencies.add(new Currency(currencyCode, operationDate.getDate(), new BigDecimal(getValueFromXlsx())));
 
         List<Currency> actualCurrencies = moonAlgorithm.execute(currencyCode, operationDate, inputCurrencies);
 
@@ -93,16 +76,9 @@ class MoonAlgorithmTest {
         CurrencyCode currencyCode = CurrencyCode.AMD;
         Operation operationDate = new Operation(LocalDate.now().minusDays(1));
 
-        BigDecimal bigDecimal = new BigDecimal("77.14");
-        int j = 1;
-
-        List<Currency> inputCurrencies = new ArrayList<>();
-        for (double i = 1; i < Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH + 1; i++, j++) {
-            if (i % 2 == 0) {
-                bigDecimal = bigDecimal.add(BigDecimal.valueOf(i / 10));
-            }
-            inputCurrencies.add(new Currency(currencyCode, LocalDate.now().minusDays(j), bigDecimal));
-        }
+        List<Currency> inputCurrencies = new ArrayList<>(
+                receiveCurrency(currencyCode, new BigDecimal("77.14"),Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
 
         assertThatThrownBy(() -> moonAlgorithm.execute(currencyCode, operationDate, inputCurrencies))
                 .isExactlyInstanceOf(IllegalArgumentException.class);

@@ -8,12 +8,12 @@ import ru.liga.currencybase.exception.InsufficientDataException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
+import static ru.liga.currencybase.TestHelper.receiveCurrency;
 
 class AlgorithmExecutorTest {
 
@@ -31,16 +31,24 @@ class AlgorithmExecutorTest {
         CurrencyCode currencyCode = CurrencyCode.EUR;
         Operation operationPeriod = new Operation(Period.WEEK);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("70.70")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("70.70"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.OLD, currencyCode, operationPeriod)).hasSize(7);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("60.60")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("60.60"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.MOON, currencyCode, operationPeriod)).hasSize(7);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("44.56")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("44.56"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.MIST, currencyCode, operationPeriod)).hasSize(7);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("12.32")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("12.32"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.PAST_YEAR, currencyCode, operationPeriod)).hasSize(7);
     }
 
@@ -68,16 +76,24 @@ class AlgorithmExecutorTest {
         CurrencyCode currencyCode = CurrencyCode.TRY;
         Operation operationDate = new Operation(LocalDate.now().plusDays(1));
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("99.70")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("99.70"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.OLD, currencyCode, operationDate)).hasSize(1);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("23.60")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("23.60"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.MOON, currencyCode, operationDate)).hasSize(1);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("45.56")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("45.56"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.MIST, currencyCode, operationDate)).hasSize(1);
 
-        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(receiveCurrency(currencyCode, new BigDecimal("89.32")));
+        when(cacheCurrency.receiveCurrency(currencyCode)).thenReturn(
+                receiveCurrency(currencyCode, new BigDecimal("89.32"), Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH)
+        );
         assertThat(algorithmExecutor.executeAlgorithm(Algorithm.PAST_YEAR, currencyCode, operationDate)).hasSize(1);
     }
 
@@ -100,15 +116,4 @@ class AlgorithmExecutorTest {
                 .isExactlyInstanceOf(InsufficientDataException.class);
     }
 
-    private List<Currency> receiveCurrency(CurrencyCode currencyCode, BigDecimal beginCurs) {
-        int j = 1;
-        List<Currency> result = new ArrayList<>();
-        for (double i = 1; i < Constant.NUMBER_OF_PREVIOUS_COURSES_MONTH + 1; i++, j++) {
-            if (i % 2 == 0) {
-                beginCurs = beginCurs.add(BigDecimal.valueOf(i / 10));
-            }
-            result.add(new Currency(currencyCode, LocalDate.now().minusDays(j).minusYears(1), beginCurs));
-        }
-        return result;
-    }
 }
