@@ -15,7 +15,7 @@ public class HelpCommand extends ServiceCommand {
     private final ICommandRegistry commandRegistry;
 
     public HelpCommand(ICommandRegistry commandRegistry) {
-        super(CommandIdentifier.HELP.name().toLowerCase(), "Получите все команды, которые предоставляет этот бот");
+        super(CommandIdentifier.HELP.name(), "Получите все команды, которые предоставляет этот бот");
         this.commandRegistry = commandRegistry;
     }
 

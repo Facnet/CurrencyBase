@@ -10,7 +10,7 @@ import ru.liga.currencybase.entity.CommandIdentifier;
  */
 public class StartCommand extends ServiceCommand {
     public StartCommand() {
-        super(CommandIdentifier.START.name().toLowerCase(), "С помощью этой команды вы можете запустить бота");
+        super(CommandIdentifier.START.name(), "С помощью этой команды вы можете запустить бота");
     }
 
     @Override
