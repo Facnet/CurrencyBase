@@ -20,7 +20,7 @@ public class RateServiceCommand extends ServiceCommand {
     private final ParserRateCommand parserRateCommand;
 
     public RateServiceCommand() {
-        super(CommandIdentifier.RATE.name(), """
+        super(CommandIdentifier.RATE, """
                 Алгоритм прогнозирования курса валют.
                 rate 'код_валюты' -period tomorrow/week/month -alg old/past_year/mist -output list/graph
                 rate 'код_валюты' -date 'День.Месяц.Год' -alg old/past_year/mist -output list/graph""");
