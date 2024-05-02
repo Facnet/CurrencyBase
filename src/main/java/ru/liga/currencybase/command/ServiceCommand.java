@@ -33,7 +33,7 @@ abstract class ServiceCommand extends BotCommand {
             message.setText(messageText.toString());
         } else {
             message.setText("Ой, при выполнении команды формируется слишком большой текст, выполните команду частями");
-            log.error(getUserName(user) + " " + commandName + " слишком большой текст");
+            log.error(getUserName(user) + " " + commandName + " слишком большой текст.");
         }
         try {
             absSender.execute(message);
